@@ -1,4 +1,4 @@
-"""Word and line helpers for plain text."""
+"""Word counts for plain text."""
 
 import re
 from collections import Counter
