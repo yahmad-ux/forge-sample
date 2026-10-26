@@ -16,6 +16,14 @@ def word_count(text: str) -> int:
     return len(words(text))
 
 
+def line_count(text: str) -> int:
+    """Return the number of lines in text.
+
+    Empty text has 0 lines. A trailing newline does not add a line.
+    """
+    return len(text.splitlines())
+
+
 def top_words(text: str, n: int) -> list[tuple[str, int]]:
     """Return the n most common words and their counts, most common first.
 

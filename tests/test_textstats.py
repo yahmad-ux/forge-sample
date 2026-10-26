@@ -1,6 +1,6 @@
 import unittest
 
-from forge_sample.textstats import top_words, word_count, words
+from forge_sample.textstats import line_count, top_words, word_count, words
 
 
 class WordsTest(unittest.TestCase):
@@ -20,6 +20,23 @@ class WordCountTest(unittest.TestCase):
 
     def test_punctuation_only(self) -> None:
         self.assertEqual(word_count("... !"), 0)
+
+
+class LineCountTest(unittest.TestCase):
+    def test_empty_text(self) -> None:
+        self.assertEqual(line_count(""), 0)
+
+    def test_single_line_without_newline(self) -> None:
+        self.assertEqual(line_count("one"), 1)
+
+    def test_multiple_lines(self) -> None:
+        self.assertEqual(line_count("one\ntwo\nthree"), 3)
+
+    def test_trailing_newline_adds_no_line(self) -> None:
+        self.assertEqual(line_count("one\ntwo\n"), 2)
+
+    def test_blank_lines_are_counted(self) -> None:
+        self.assertEqual(line_count("one\n\ntwo"), 3)
 
 
 class TopWordsTest(unittest.TestCase):
