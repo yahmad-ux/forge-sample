@@ -24,6 +24,15 @@ def line_count(text: str) -> int:
     return len(text.splitlines())
 
 
+def char_count(text: str) -> int:
+    """Return the number of characters in text, not counting newlines.
+
+    Line feed and carriage return both count as newlines, so a Windows line
+    ending adds 0.
+    """
+    return len(text.replace("\r", "").replace("\n", ""))
+
+
 def top_words(text: str, n: int) -> list[tuple[str, int]]:
     """Return the n most common words and their counts, most common first.
 
