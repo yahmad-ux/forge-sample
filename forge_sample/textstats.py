@@ -1,9 +1,19 @@
-"""Word counts for plain text."""
+"""Word counts for plain text.
+
+Helpers:
+- words: the lowercased words in text.
+- word_count: the number of words.
+- line_count: the number of lines.
+- char_count: the number of characters, not counting newlines.
+- top_words: the most common words and their counts.
+- sentence_count: the number of sentences ended by ".", "!" or "?".
+"""
 
 import re
 from collections import Counter
 
 _WORD = re.compile(r"[A-Za-z0-9']+")
+_SENTENCE_END = re.compile(r"[.!?]+")
 
 
 def words(text: str) -> list[str]:
@@ -41,3 +51,12 @@ def top_words(text: str, n: int) -> list[tuple[str, int]]:
     if n < 0:
         raise ValueError("n must be zero or more")
     return Counter(words(text)).most_common(n)
+
+
+def sentence_count(text: str) -> int:
+    """Return the number of sentences in text.
+
+    A sentence ends with ".", "!" or "?". A run of these marks, such as "?!"
+    or "...", counts once. Empty or whitespace-only text has 0 sentences.
+    """
+    return len(_SENTENCE_END.findall(text))
