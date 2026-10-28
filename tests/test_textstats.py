@@ -3,6 +3,7 @@ import unittest
 from forge_sample.textstats import (
     char_count,
     line_count,
+    sentence_count,
     top_words,
     word_count,
     words,
@@ -79,3 +80,20 @@ class TopWordsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SentenceCountTest(unittest.TestCase):
+    def test_counts_each_terminator(self) -> None:
+        self.assertEqual(sentence_count("One. Two! Three?"), 3)
+
+    def test_run_of_terminators_counts_once(self) -> None:
+        self.assertEqual(sentence_count("Really?! Yes... ok."), 3)
+
+    def test_empty_text(self) -> None:
+        self.assertEqual(sentence_count(""), 0)
+
+    def test_whitespace_only_text(self) -> None:
+        self.assertEqual(sentence_count(" \n\t "), 0)
+
+    def test_text_without_terminator(self) -> None:
+        self.assertEqual(sentence_count("no ending here"), 0)
