@@ -6,6 +6,7 @@ Helpers:
 - line_count: the number of lines.
 - char_count: the number of characters, not counting newlines.
 - top_words: the most common words and their counts.
+- word_frequencies: every word and its count, most common first.
 - sentence_count: the number of sentences ended by ".", "!" or "?".
 """
 
@@ -51,6 +52,15 @@ def top_words(text: str, n: int) -> list[tuple[str, int]]:
     if n < 0:
         raise ValueError("n must be zero or more")
     return Counter(words(text)).most_common(n)
+
+
+def word_frequencies(text: str) -> list[tuple[str, int]]:
+    """Return every word in text with its count, most common first.
+
+    Words are lowercased and stripped of punctuation by words(). Words with
+    the same count keep the order in which they first appear.
+    """
+    return Counter(words(text)).most_common()
 
 
 def sentence_count(text: str) -> int:

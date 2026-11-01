@@ -6,6 +6,7 @@ from forge_sample.textstats import (
     sentence_count,
     top_words,
     word_count,
+    word_frequencies,
     words,
 )
 
@@ -76,6 +77,30 @@ class TopWordsTest(unittest.TestCase):
     def test_negative_n_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
             top_words("a", -1)
+
+
+class WordFrequenciesTest(unittest.TestCase):
+    def test_mixed_case_is_counted_together(self) -> None:
+        self.assertEqual(word_frequencies("Fig fig FIG"), [("fig", 3)])
+
+    def test_punctuation_is_stripped(self) -> None:
+        self.assertEqual(
+            word_frequencies("plum, plum! (kiwi)"), [("plum", 2), ("kiwi", 1)]
+        )
+
+    def test_ties_keep_first_seen_order(self) -> None:
+        self.assertEqual(
+            word_frequencies("pear apple lime"),
+            [("pear", 1), ("apple", 1), ("lime", 1)],
+        )
+
+    def test_empty_text(self) -> None:
+        self.assertEqual(word_frequencies(""), [])
+
+    def test_repeated_words_sorted_by_count(self) -> None:
+        self.assertEqual(
+            word_frequencies("b a b c b a"), [("b", 3), ("a", 2), ("c", 1)]
+        )
 
 
 if __name__ == "__main__":
