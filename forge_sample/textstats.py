@@ -7,6 +7,7 @@ Helpers:
 - char_count: the number of characters, not counting newlines.
 - top_words: the most common words and their counts.
 - sentence_count: the number of sentences ended by ".", "!" or "?".
+- longest_word: the longest word, the first one on ties.
 """
 
 import re
@@ -60,3 +61,12 @@ def sentence_count(text: str) -> int:
     or "...", counts once. Empty or whitespace-only text has 0 sentences.
     """
     return len(_SENTENCE_END.findall(text))
+
+
+def longest_word(text: str) -> str:
+    """Return the longest word in text, lowercased as words() returns it.
+
+    If several words share the longest length, the first one wins. Text with
+    no words returns an empty string.
+    """
+    return max(words(text), key=len, default="")
