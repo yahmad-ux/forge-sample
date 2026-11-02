@@ -3,6 +3,7 @@ import unittest
 from forge_sample.textstats import (
     char_count,
     line_count,
+    longest_word,
     sentence_count,
     top_words,
     word_count,
@@ -122,3 +123,23 @@ class SentenceCountTest(unittest.TestCase):
 
     def test_text_without_terminator(self) -> None:
         self.assertEqual(sentence_count("no ending here"), 0)
+
+
+class LongestWordTest(unittest.TestCase):
+    def test_returns_clear_longest_word(self) -> None:
+        self.assertEqual(longest_word("a cat sat on elephants"), "elephants")
+
+    def test_tie_returns_first_word(self) -> None:
+        self.assertEqual(longest_word("bird fish ant frog"), "bird")
+
+    def test_punctuation_is_not_part_of_word(self) -> None:
+        self.assertEqual(longest_word("Hi, there... wonderful!"), "wonderful")
+
+    def test_mixed_case_is_lowercased(self) -> None:
+        self.assertEqual(longest_word("a PineApple b"), "pineapple")
+
+    def test_empty_text(self) -> None:
+        self.assertEqual(longest_word(""), "")
+
+    def test_text_without_words(self) -> None:
+        self.assertEqual(longest_word("... !"), "")
