@@ -8,6 +8,7 @@ Helpers:
 - top_words: the most common words and their counts.
 - word_frequencies: every word and its count, most common first.
 - sentence_count: the number of sentences ended by ".", "!" or "?".
+- file_word_count: the number of words in a UTF-8 text file.
 """
 
 import re
@@ -70,3 +71,13 @@ def sentence_count(text: str) -> int:
     or "...", counts once. Empty or whitespace-only text has 0 sentences.
     """
     return len(_SENTENCE_END.findall(text))
+
+
+def file_word_count(path: str) -> int:
+    """Return the number of words in the UTF-8 text file at path.
+
+    Raises FileNotFoundError if path does not exist and IsADirectoryError if
+    path is a directory.
+    """
+    with open(path, encoding="utf-8") as file:
+        return word_count(file.read())
