@@ -8,6 +8,7 @@ Helpers:
 - top_words: the most common words and their counts.
 - word_frequencies: every word and its count, most common first.
 - sentence_count: the number of sentences ended by ".", "!" or "?".
+- average_word_length: the average length of the words, to 2 places.
 - file_word_count: the number of words in a UTF-8 text file.
 """
 
@@ -71,6 +72,18 @@ def sentence_count(text: str) -> int:
     or "...", counts once. Empty or whitespace-only text has 0 sentences.
     """
     return len(_SENTENCE_END.findall(text))
+
+
+def average_word_length(text: str) -> float:
+    """Return the average length of the words in text, rounded to 2 places.
+
+    Words come from words(), so apostrophes count as letters and other
+    punctuation does not. Text with no words has an average of 0.0.
+    """
+    found = words(text)
+    if not found:
+        return 0.0
+    return round(sum(len(word) for word in found) / len(found), 2)
 
 
 def file_word_count(path: str) -> int:
