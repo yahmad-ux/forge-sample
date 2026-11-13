@@ -3,6 +3,7 @@ import tempfile
 import unittest
 
 from forge_sample.textstats import (
+    average_word_length,
     char_count,
     file_word_count,
     line_count,
@@ -104,6 +105,26 @@ class WordFrequenciesTest(unittest.TestCase):
         self.assertEqual(
             word_frequencies("b a b c b a"), [("b", 3), ("a", 2), ("c", 1)]
         )
+
+
+class AverageWordLengthTest(unittest.TestCase):
+    def test_averages_word_lengths(self) -> None:
+        self.assertEqual(average_word_length("plum pear fig"), 3.67)
+
+    def test_exact_average(self) -> None:
+        self.assertEqual(average_word_length("ab abcd"), 3.0)
+
+    def test_punctuation_is_not_counted(self) -> None:
+        self.assertEqual(average_word_length("fig, kiwi! (plum)"), 3.67)
+
+    def test_apostrophes_count_as_letters(self) -> None:
+        self.assertEqual(average_word_length("it's ok"), 3.0)
+
+    def test_empty_text(self) -> None:
+        self.assertEqual(average_word_length(""), 0.0)
+
+    def test_punctuation_only_text(self) -> None:
+        self.assertEqual(average_word_length("... !"), 0.0)
 
 
 class FileWordCountTest(unittest.TestCase):
