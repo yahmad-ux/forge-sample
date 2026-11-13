@@ -7,6 +7,7 @@ from forge_sample.textstats import (
     char_count,
     file_word_count,
     line_count,
+    redact_personal_data,
     sentence_count,
     top_words,
     word_count,
@@ -178,3 +179,65 @@ class SentenceCountTest(unittest.TestCase):
 
     def test_text_without_terminator(self) -> None:
         self.assertEqual(sentence_count("no ending here"), 0)
+
+
+class RedactPersonalDataTest(unittest.TestCase):
+    def test_replaces_email(self) -> None:
+        self.assertEqual(
+            redact_personal_data("Write to jane.doe+x@mail.example.com today."),
+            "Write to [email] today.",
+        )
+
+    def test_replaces_dashed_phone(self) -> None:
+        self.assertEqual(redact_personal_data("Call 555-010-1234."), "Call [phone].")
+
+    def test_replaces_parenthesised_phone(self) -> None:
+        self.assertEqual(redact_personal_data("Call (555) 010-1234!"), "Call [phone]!")
+
+    def test_replaces_dotted_and_spaced_phone(self) -> None:
+        self.assertEqual(redact_personal_data("555.010.1234"), "[phone]")
+        self.assertEqual(redact_personal_data("555 010 1234"), "[phone]")
+
+    def test_replaces_phone_with_country_prefix(self) -> None:
+        self.assertEqual(redact_personal_data("+1 555-010-1234"), "[phone]")
+        self.assertEqual(redact_personal_data("1-555-010-1234"), "[phone]")
+        self.assertEqual(redact_personal_data("+1 (555) 010-1234"), "[phone]")
+
+    def test_replaces_solid_ten_digit_phone(self) -> None:
+        self.assertEqual(redact_personal_data("5550101234"), "[phone]")
+
+    def test_seven_digit_numbers_are_unchanged(self) -> None:
+        self.assertEqual(redact_personal_data("Ref 123-4567 now"), "Ref 123-4567 now")
+
+    def test_year_after_international_phone_is_kept(self) -> None:
+        self.assertEqual(redact_personal_data("+44 20 7946 0123 2024"), "[phone] 2024")
+        self.assertEqual(
+            redact_personal_data("+44 20 7946 0123 in 2024"), "[phone] in 2024"
+        )
+
+    def test_long_text_without_email_is_handled_quickly(self) -> None:
+        text = "a" * 50000
+        self.assertEqual(redact_personal_data(text), text)
+        self.assertEqual(redact_personal_data(text + "@example.com"), "[email]")
+
+    def test_replaces_international_phone(self) -> None:
+        self.assertEqual(redact_personal_data("+44 20 7946 0123"), "[phone]")
+        self.assertEqual(redact_personal_data("+55-11-5550-0123 ok"), "[phone] ok")
+
+    def test_replaces_several_items_in_one_text(self) -> None:
+        self.assertEqual(
+            redact_personal_data("a@example.com, 555-010-1234\nb@example.com"),
+            "[email], [phone]\n[email]",
+        )
+
+    def test_empty_text_returns_empty_string(self) -> None:
+        self.assertEqual(redact_personal_data(""), "")
+
+    def test_text_without_personal_data_is_unchanged(self) -> None:
+        text = "Hello, World!\n  It's 2024. Meet at 5 pm @ the cafe."
+        self.assertEqual(redact_personal_data(text), text)
+
+    def test_short_numbers_are_unchanged(self) -> None:
+        for text in ("12345", "555-01", "+123456", "in 2024", "123456789"):
+            with self.subTest(text=text):
+                self.assertEqual(redact_personal_data(text), text)
