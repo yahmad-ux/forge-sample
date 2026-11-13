@@ -1,7 +1,10 @@
+import os
+import tempfile
 import unittest
 
 from forge_sample.textstats import (
     char_count,
+    file_word_count,
     line_count,
     sentence_count,
     top_words,
@@ -101,6 +104,38 @@ class WordFrequenciesTest(unittest.TestCase):
         self.assertEqual(
             word_frequencies("b a b c b a"), [("b", 3), ("a", 2), ("c", 1)]
         )
+
+
+class FileWordCountTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+
+    def write(self, name: str, text: str) -> str:
+        path = os.path.join(self.dir.name, name)
+        with open(path, "w", encoding="utf-8") as file:
+            file.write(text)
+        return path
+
+    def test_counts_words_in_file(self) -> None:
+        path = self.write("a.txt", "plum pear\nfig, kiwi!\n")
+        self.assertEqual(file_word_count(path), 4)
+
+    def test_reads_utf8_text(self) -> None:
+        path = self.write("u.txt", "café plum")
+        self.assertEqual(file_word_count(path), 2)
+
+    def test_empty_file(self) -> None:
+        self.assertEqual(file_word_count(self.write("e.txt", "")), 0)
+
+    def test_missing_file_raises(self) -> None:
+        missing = os.path.join(self.dir.name, "missing.txt")
+        with self.assertRaises(FileNotFoundError):
+            file_word_count(missing)
+
+    def test_directory_raises(self) -> None:
+        with self.assertRaises(IsADirectoryError):
+            file_word_count(self.dir.name)
 
 
 if __name__ == "__main__":
